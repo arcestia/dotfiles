@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "🚀 Updating DNF packages..."
+sudo dnf upgrade --refresh -y
+
+echo "📦 Updating Flatpaks..."
+flatpak update -y
+
+echo "✅ System up to date!"

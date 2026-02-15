@@ -1,0 +1,4 @@
+#!/bin/sh
+# Reset to HEAD and remove all untracked files/folders
+git reset --hard HEAD
+git clean -fd

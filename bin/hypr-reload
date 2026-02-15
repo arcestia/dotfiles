@@ -1,0 +1,10 @@
+#!/bin/bash
+# Refresh Waybar, Notifications, and Wallpaper
+killall waybar swaync hyprpaper 2>/dev/null
+
+# Restart them in the background
+waybar &
+swaync &
+hyprpaper &
+
+notify-send "Hyprland" "Desktop components reloaded"

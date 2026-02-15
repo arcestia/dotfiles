@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stage all unstaged changes (including deletions and new files)
+git add -A

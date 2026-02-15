@@ -19,7 +19,7 @@
 # --- CONDITIONAL INCLUDES ---
 
 # 1. Forgejo Server (Local Home)
-[includeIf "gitdir:~/projects/skiddle/"]
+[includeIf "gitdir:~/projects/"]
     path = ~/.gitconfig-skiddle
 
 # 2. Work Projects (External SSD)

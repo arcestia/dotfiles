@@ -1,23 +1,16 @@
-# 🌌 Skiddle Dotfiles (Fedora + Hyprland)
+# 🐚 arcestia's dotfiles
 
-Personal dotfiles managed and backed up to GitHub. This repository contains my workflow configurations for a Fedora-based Hyprland desktop environment, optimized for development across personal and work projects.
+Personal configurations for Fedora + Hyprland, organized following the [Holman](https://github.com/holman/dotfiles) topical structure.
 
-## 💻 Tech Stack
-* **OS:** Fedora Linux
-* **WM:** [Hyprland](https://hyprland.org/) (Wayland)
-* **Shell:** Zsh (with Oh My Zsh)
-* **Terminals:** Kitty (Primary), Ghostty, Wezterm
-* **Editor:** Neovim / VS Code
-* **Git Server:** Self-hosted [Forgejo](https://forgejo.org/) (git.skiddle.dev)
+## 📂 Structure
 
-## 📁 Repository Structure
-* `/config`: Most app-specific settings (Hyprland, Waybar, Rofi, etc.)
-* `/git`: Multi-identity Git configurations (Work, Personal GH, Forgejo)
-* `/zsh`: Shell aliases, profiles, and environment variables
-* `install.sh`: Automated symlink script to deploy configurations
+- **`bin/`**: Custom executable scripts (e.g., `dotsync`, `hypr-reload`).
+- **`git/`**: Git configuration with GPG/SSH signing and custom aliases.
+- **`hypr/`**: Hyprland desktop environment settings.
+- **`system/`**: General system aliases (`lsd`, `fastfetch`) and PATH settings.
+- **`zsh/`**: Zsh configuration and the "topical loader" logic.
 
-## 🚀 Quick Setup
-To deploy these dotfiles on a fresh Fedora installation:
+## 🚀 Installation
 
 1. **Clone the repository:**
    ```bash

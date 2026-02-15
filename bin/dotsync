@@ -1,9 +1,21 @@
 #!/bin/bash
+# Move to dotfiles directory
 cd "$HOME/dotfiles" || exit
+
+# Check if we are using the correct personal signing key
+CURRENT_KEY=$(git config user.signingkey)
+EXPECTED_KEY="$HOME/.ssh/id_ed25519_personal_sign.pub"
+
+if [ "$CURRENT_KEY" != "$EXPECTED_KEY" ]; then
+    echo "⚠️ Error: Wrong signing key detected ($CURRENT_KEY)"
+    echo "Switching to personal identity..."
+    git config user.email "jeff@skiddle.id"
+    git config user.signingkey "$EXPECTED_KEY"
+fi
 
 echo "🔄 Syncing dotfiles..."
 git add -A
 git commit -m "update: $(date +'%Y-%m-%d %H:%M:%S')"
 git push origin main
 
-notify-send "Dotfiles" "Configurations synced to GitHub"
+notify-send "Dotfiles" "Configurations synced and signed ✅"

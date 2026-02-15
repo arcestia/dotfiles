@@ -1,0 +1,15 @@
+# Secret Files
+.ssh/id_*
+.ssh/known_hosts
+*.pem
+*.key
+.env
+
+# Large Cache/Data
+.cache/
+npm/
+node_modules/
+zcompdump*
+.zsh_history
+.zsh_sessions/
+.zcompdump*

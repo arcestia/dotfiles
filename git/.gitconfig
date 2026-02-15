@@ -1,0 +1,33 @@
+# --- GITHUB CREDENTIALS (KEEP THESE) ---
+[credential "https://github.com"]
+    helper = 
+    helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+    helper = 
+    helper = !/usr/bin/gh auth git-credential
+
+# --- CORE SETTINGS ---
+[core]
+    autocrlf = input
+
+# --- DEFAULT IDENTITY ---
+# This is used for any folder that doesn't match the rules below
+[user]
+    name = arcestia
+    email = jeff@skiddle.id
+
+# --- CONDITIONAL INCLUDES ---
+
+# 1. Forgejo Server (Local Home)
+[includeIf "gitdir:~/projects/skiddle/"]
+    path = ~/.gitconfig-skiddle
+
+# 2. Work Projects (External SSD)
+[includeIf "gitdir:/run/media/laurenhs/Data/work/"]
+    path = ~/.gitconfig-work
+
+# 3. Personal GitHub Projects (External SSD)
+[includeIf "gitdir:/run/media/laurenhs/Data/personal-github/"]
+    path = ~/.gitconfig-personal-gh
+[init]
+	defaultBranch = main

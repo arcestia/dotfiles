@@ -68,15 +68,20 @@ do
 done
 
 # 2. Handle .config files (Target: $HOME/.config/name)
-# We look for anything inside 'config' folders in your topics
-# Example: hypr/config/hypr -> ~/.config/hypr
-for src in $(find -H "$DOTFILES_ROOT" -maxdepth 3 -path "*/config/*")
+# We only want to link the top-level items inside the 'config' folders
+for config_dir in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name "config" -type d)
 do
-  # Calculate relative path from the 'config' folder
-  # This allows for nested configs like ~/.config/hypr/hyprland.conf
-  rel_path=$(echo "$src" | sed 's|.*\/config\/||')
-  dst="$HOME/.config/$rel_path"
-  link_file "$src" "$dst"
+  for src in "$config_dir"/*
+  do
+    # Skip if the directory is empty
+    [ -e "$src" ] || continue
+    
+    # Get the name of the file/folder (e.g., "hypr" or "waybar")
+    name=$(basename "$src")
+    dst="$HOME/.config/$name"
+    
+    link_file "$src" "$dst"
+  done
 done
 
 echo "✅ Bootstrap complete!"

@@ -1,3 +1,4 @@
 [user]
     name = arcestia
     email = jeff@skiddle.id
+    signingkey = ~/.ssh/id_ed25519_personal_sign.pub

@@ -31,3 +31,9 @@
     path = ~/.gitconfig-personal-gh
 [init]
 	defaultBranch = main
+[gpg]
+    format = ssh
+[commit]
+    gpgsign = true
+[gpg "ssh"]
+    allowedSignersFile = ~/.ssh/allowed_signers

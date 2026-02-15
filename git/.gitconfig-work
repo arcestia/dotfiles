@@ -1,3 +1,5 @@
 [user]
     name = ithsjeff
     email = iths003.hsgroup@gmail.com
+    signingkey = ~/.ssh/id_ed25519_work_sign.pub
+

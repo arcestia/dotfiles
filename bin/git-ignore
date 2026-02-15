@@ -1,0 +1,16 @@
+#!/bin/bash
+# Add arguments to .gitignore
+
+if [ -z "$1" ]; then
+    echo "Usage: git-ignore <file_or_pattern>"
+    exit 1
+fi
+
+for pattern in "$@"; do
+    if grep -qF "$pattern" .gitignore 2>/dev/null; then
+        echo "⚠️  $pattern is already ignored"
+    else
+        echo "$pattern" >> .gitignore
+        echo "🚫 Added $pattern to .gitignore"
+    fi
+done

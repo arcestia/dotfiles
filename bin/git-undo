@@ -1,0 +1,5 @@
+#!/bin/bash
+# Undo last commit, keep changes staged
+echo "⏮️  Undoing last commit..."
+git reset --soft HEAD~1
+echo "✅ Commit undone. Changes are staged."

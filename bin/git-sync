@@ -1,0 +1,19 @@
+#!/bin/bash
+# Sync current repo: Pull -> Add All -> Commit (Timestamp) -> Push
+
+# Check if inside a git repo
+git rev-parse --is-inside-work-tree > /dev/null 2>&1 || { echo "Not a git repo"; exit 1; }
+
+echo "🔄 Pulling updates..."
+git pull
+
+echo "➕ Adding changes..."
+git add -A
+
+echo "💾 Committing..."
+git commit -m "sync: $(date +'%Y-%m-%d %H:%M:%S')"
+
+echo "🚀 Pushing..."
+git push
+
+echo "✅ Done!"

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "Starting system cleanup..."
+
+# 1. Clear DNF Cache (Metadata and packages)
+echo "--- Cleaning DNF cache ---"
+sudo dnf clean all
+
+# 2. Clear Systemd Journal logs (Keeps last 2 days only)
+echo "--- Trimming Journal logs ---"
+sudo journalctl --vacuum-time=2d
+
+# 3. Clear User Cache (~/.cache)
+# Note: We exclude some folders that might store important state
+echo "--- Cleaning user cache ---"
+find ~/.cache -type f -atime +7 -delete
+
+# 4. Clear Temporary Files via Systemd
+echo "--- Cleaning /tmp and /var/tmp ---"
+sudo systemd-tmpfiles --clean
+
+# 5. Flatpak (if you use it) - Remove unused runtimes
+if command -v flatpak &> /dev/null; then
+    echo "--- Cleaning unused Flatpaks ---"
+    flatpak uninstall --unused -y
+fi
+
+echo "Cleanup complete!"

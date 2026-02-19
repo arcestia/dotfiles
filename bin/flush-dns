@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Ensure the script is run with root privileges
+if [[ $EUID -ne 0 ]]; then
+   echo "Error: This script must be run as root (use sudo)."
+   exit 1
+fi
+
+echo "--- Starting DNS Cache Flush ---"
+
+# 1. Flush systemd-resolved cache
+echo "Step 1: Flushing systemd-resolved cache..."
+resolvectl flush-caches
+
+# 2. Reset the service to ensure a clean state
+echo "Step 2: Restarting systemd-resolved..."
+systemctl restart systemd-resolved
+
+# 3. Verify the cache is empty
+echo "Step 3: Verification"
+echo "--------------------------------"
+resolvectl statistics | grep -i "Cache"
+echo "--------------------------------"
+
+echo "Success: Fedora DNS cache has been cleared."

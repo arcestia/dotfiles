@@ -1,21 +1,23 @@
 #!/bin/bash
-# Move to dotfiles directory
 cd "$HOME/dotfiles" || exit
 
-# Check if we are using the correct personal signing key
-CURRENT_KEY=$(git config user.signingkey)
+# Identity Check (Keep this to ensure signatures work)
 EXPECTED_KEY="$HOME/.ssh/id_ed25519_personal_sign.pub"
-
-if [ "$CURRENT_KEY" != "$EXPECTED_KEY" ]; then
-    echo "⚠️ Error: Wrong signing key detected ($CURRENT_KEY)"
-    echo "Switching to personal identity..."
+if [ "$(git config user.signingkey)" != "$EXPECTED_KEY" ]; then
     git config user.email "jeff@skiddle.id"
     git config user.signingkey "$EXPECTED_KEY"
 fi
 
-echo "🔄 Syncing dotfiles..."
+echo "🔄 Staging changes..."
 git add -A
-git commit -m "update: $(date +'%Y-%m-%d %H:%M:%S')"
-git push origin main
 
-notify-send "Dotfiles" "Configurations synced and signed ✅"
+# Generate AI Commit Message (Flag removed)
+echo "🤖 Generating AI commit message..."
+if aicommits; then
+    echo "🚀 Pushing to origin..."
+    git push origin main
+    notify-send "Dotfiles" "AI-Generated commit synced and signed ✅"
+else
+    notify-send "Dotfiles" "❌ AI Commit failed"
+    exit 1
+fi

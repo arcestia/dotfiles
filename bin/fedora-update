@@ -1,8 +1,132 @@
 #!/bin/bash
-echo "🚀 Updating DNF packages..."
-sudo dnf upgrade --refresh -y
 
-echo "📦 Updating Flatpaks..."
-flatpak update -y
+# --- Color Definitions ---
+BOLD=$(tput bold)
+BLUE=$(tput setaf 4)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+RED=$(tput setaf 1)
+RESET=$(tput sgr0)
 
-echo "✅ System up to date!"
+# --- Helper Functions ---
+header() {
+    echo -e "\n${BOLD}${BLUE}=== $1 ===${RESET}"
+}
+
+success() {
+    echo -e "${GREEN}✔ $1${RESET}"
+}
+
+info() {
+    echo -e "${YELLOW}➜ $1${RESET}"
+}
+
+error() {
+    echo -e "${RED}✘ $1${RESET}"
+}
+
+# --- Initialization ---
+clear
+echo -e "${BOLD}${BLUE}🚀 Starting Master Maintenance Strategy${RESET}"
+echo "----------------------------------------"
+
+# ==========================================
+# PART 1: UPDATE STRATEGY
+# ==========================================
+header "System & App Updates"
+
+# 1. DNF (Fedora)
+info "Refreshing DNF repositories and upgrading..."
+sudo dnf upgrade --refresh -y > /dev/null && success "System packages updated"
+
+# 2. Flatpak
+if command -v flatpak &> /dev/null; then
+    info "Updating Flatpaks..."
+    flatpak update -y &> /dev/null && success "Flatpaks updated"
+fi
+
+# 3. Homebrew
+if command -v brew &> /dev/null; then
+    info "Updating Homebrew..."
+    brew update && brew upgrade &> /dev/null && success "Brew updated"
+fi
+
+# 4. Snap
+if command -v snap &> /dev/null; then
+    info "Refreshing Snaps..."
+    sudo snap refresh &> /dev/null && success "Snaps refreshed"
+fi
+
+# 5. Dev Toolchains
+header "Development Toolchains"
+
+if command -v rustup &> /dev/null; then
+    info "Updating Rust..."
+    rustup update &> /dev/null && success "Rust toolchains updated"
+fi
+
+if command -v go &> /dev/null; then
+    info "Current Go: $(go version | awk '{print $3}')"
+fi
+
+# ==========================================
+# PART 2: CLEANUP STRATEGY
+# ==========================================
+header "Deep Cleanup Operations"
+
+# 1. System Logs & Cache
+info "Cleaning DNF cache & Journal logs..."
+sudo dnf clean all > /dev/null
+sudo journalctl --vacuum-time=2d > /dev/null 2>&1
+success "System logs and DNF cache cleared"
+
+# 2. Snap Deep Clean (Removes old versions)
+if command -v snap &> /dev/null; then
+    info "Purging old Snap revisions..."
+    snap list --all | awk '/disabled/{print $1, $3}' |
+        while read snapname revision; do
+            sudo snap remove "$snapname" --revision="$revision" &> /dev/null
+        done
+    success "Snap revisions purged"
+fi
+
+# 3. Homebrew Cleanup
+if command -v brew &> /dev/null; then
+    info "Cleaning Brew cache..."
+    brew cleanup -s &> /dev/null
+    rm -rf "$(brew --cache)" &> /dev/null
+    success "Brew environment leaned"
+fi
+
+# 4. Dev Caches (Go, Rust, NPM, Pip, Composer)
+info "Purging Dev Caches (Go, Rust, Node, Python, PHP)..."
+[ -x "$(command -v go)" ] && go clean -modcache -cache -i &> /dev/null
+[ -x "$(command -v npm)" ] && npm cache clean --force &> /dev/null
+[ -x "$(command -v pip)" ] && pip cache purge &> /dev/null
+[ -x "$(command -v composer)" ] && composer clear-cache -q &> /dev/null
+[ -x "$(command -v cargo-cache)" ] && cargo-cache --remove-dir all &> /dev/null
+success "Developer caches cleared"
+
+# 5. Docker Logs
+if command -v docker &> /dev/null; then
+    info "Truncating Docker logs..."
+    sudo find /var/lib/docker/containers/ -name "*-json.log" -exec sh -c 'cat /dev/null > "{}"' \;
+    success "Docker logs truncated"
+fi
+
+# 6. User Filesystem
+info "Cleaning ~/.cache, thumbnails, and broken symlinks..."
+find ~/.cache -type f -atime +7 -delete
+rm -rf ~/.cache/thumbnails/*
+find ~ -maxdepth 3 -xtype l -delete &> /dev/null
+sudo systemd-tmpfiles --clean &> /dev/null
+success "Filesystem housekeeping complete"
+
+# ==========================================
+# SUMMARY
+# ==========================================
+header "Storage Status"
+df -h / | awk 'NR==2 {print "Total: " $2 " | Used: " $3 " | Free: " $4 " (" $5 ")"}'
+
+echo "----------------------------------------"
+echo -e "${BOLD}${GREEN}✅ Maintenance Complete! System is optimized.${RESET}\n"

@@ -1,25 +1,60 @@
 #!/bin/bash
 
-# Ensure the script is run with root privileges
-if [[ $EUID -ne 0 ]]; then
-   echo "Error: This script must be run as root (use sudo)."
-   exit 1
+# --- Color Definitions ---
+BOLD=$(tput bold)
+BLUE=$(tput setaf 4)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+RED=$(tput setaf 1)
+RESET=$(tput sgr0)
+
+# --- Helper Functions ---
+header() {
+    echo -e "\n${BOLD}${BLUE}=== $1 ===${RESET}"
+}
+
+success() {
+    echo -e "${GREEN}✔ $1${RESET}"
+}
+
+info() {
+    echo -e "${YELLOW}➜ $1${RESET}"
+}
+
+error() {
+    echo -e "${RED}✘ $1${RESET}"
+}
+
+# --- Initialization ---
+clear
+echo -e "${BOLD}${BLUE}🌐 DNS Resolver Maintenance${RESET}"
+echo "----------------------------------------"
+
+# 1. Systemd-Resolved
+header "System Resolver"
+info "Flushing systemd-resolved cache..."
+if resolvectl flush-caches; then
+    success "Cache flushed"
+else
+    error "Failed to flush resolvectl"
 fi
 
-echo "--- Starting DNS Cache Flush ---"
+info "Restarting systemd-resolved service..."
+if sudo systemctl restart systemd-resolved; then
+    success "Service restarted"
+else
+    error "Failed to restart service"
+fi
 
-# 1. Flush systemd-resolved cache
-echo "Step 1: Flushing systemd-resolved cache..."
-resolvectl flush-caches
+# 2. Browser DNS Tips (Info Only)
+header "Browser Specifics"
+info "Note: Browsers often maintain their own internal DNS cache."
+echo -e "  ${YELLOW}• Chrome/Edge:${RESET} chrome://net-internals/#dns"
+echo -e "  ${YELLOW}• Firefox:${RESET} about:config -> network.dnsCacheExpiration"
 
-# 2. Reset the service to ensure a clean state
-echo "Step 2: Restarting systemd-resolved..."
-systemctl restart systemd-resolved
+# 3. Verification
+header "Verification Statistics"
+resolvectl statistics | grep -i "Cache" || echo "Statistics currently unavailable."
 
-# 3. Verify the cache is empty
-echo "Step 3: Verification"
-echo "--------------------------------"
-resolvectl statistics | grep -i "Cache"
-echo "--------------------------------"
-
-echo "Success: Fedora DNS cache has been cleared."
+echo "----------------------------------------"
+echo -e "${BOLD}${GREEN}✅ DNS Environment Reset!${RESET}\n"

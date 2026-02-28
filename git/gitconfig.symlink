@@ -9,6 +9,7 @@
 # --- CORE SETTINGS ---
 [core]
     autocrlf = input
+	hooksPath = /home/laurenhs/.git-templates/hooks
 
 # --- DEFAULT IDENTITY ---
 # This is used for any folder that doesn't match the rules below
@@ -23,11 +24,11 @@
     path = ~/.gitconfig-skiddle
 
 # 2. Work Projects (External SSD)
-[includeIf "gitdir:/run/media/laurenhs/Data/work/"]
+[includeIf "gitdir:/mnt/Data/work/"]
     path = ~/.gitconfig-work
 
 # 3. Personal GitHub Projects (External SSD)
-[includeIf "gitdir:/run/media/laurenhs/Data/personal-github/"]
+[includeIf "gitdir:/mnt/Data/personal-github/"]
     path = ~/.gitconfig-personal-gh
 [init]
 	defaultBranch = main
@@ -37,3 +38,6 @@
     gpgsign = true
 [gpg "ssh"]
     allowedSignersFile = ~/.ssh/allowed_signers
+[safe]
+	directory = /mnt/Data/Project/HS Gaming
+	directory = /mnt/Data/personal-github/axon-engine

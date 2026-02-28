@@ -17,3 +17,6 @@ setopt appendhistory
 
 autoload -Uz compinit
 compinit
+
+# opencode
+export PATH=/home/laurenhs/.opencode/bin:$PATH

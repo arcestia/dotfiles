@@ -1,28 +1,108 @@
 #!/bin/bash
 
-echo "Starting system cleanup..."
+# --- Color Definitions ---
+BOLD=$(tput bold)
+BLUE=$(tput setaf 4)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+RED=$(tput setaf 1)
+RESET=$(tput sgr0)
 
-# 1. Clear DNF Cache (Metadata and packages)
-echo "--- Cleaning DNF cache ---"
-sudo dnf clean all
+# --- Helper Functions ---
+header() {
+    echo -e "\n${BOLD}${BLUE}=== $1 ===${RESET}"
+}
 
-# 2. Clear Systemd Journal logs (Keeps last 2 days only)
-echo "--- Trimming Journal logs ---"
-sudo journalctl --vacuum-time=2d
+success() {
+    echo -e "${GREEN}✔ $1${RESET}"
+}
 
-# 3. Clear User Cache (~/.cache)
-# Note: We exclude some folders that might store important state
-echo "--- Cleaning user cache ---"
-find ~/.cache -type f -atime +7 -delete
+info() {
+    echo -e "${YELLOW}➜ $1${RESET}"
+}
 
-# 4. Clear Temporary Files via Systemd
-echo "--- Cleaning /tmp and /var/tmp ---"
-sudo systemd-tmpfiles --clean
+error() {
+    echo -e "${RED}✘ $1${RESET}"
+}
 
-# 5. Flatpak (if you use it) - Remove unused runtimes
-if command -v flatpak &> /dev/null; then
-    echo "--- Cleaning unused Flatpaks ---"
-    flatpak uninstall --unused -y
+# --- Start Cleanup ---
+clear
+echo -e "${BOLD}${BLUE}🚀 Executing Master Cleanup Strategy${RESET}"
+echo "----------------------------------------"
+
+# 1. System & Logs
+header "System & Logs"
+info "Cleaning DNF cache..."
+sudo dnf clean all > /dev/null && success "DNF cleaned" || error "DNF clean failed"
+
+info "Trimming Journal logs (keeping 2 days)..."
+sudo journalctl --vacuum-time=2d > /dev/null 2>&1 && success "Logs trimmed"
+
+# 2. Advanced Development Caches
+header "Development Environment"
+
+# Go (Golang)
+if command -v go &> /dev/null; then
+    info "Cleaning Go build and module cache..."
+    go clean -modcache -cache -i &> /dev/null && success "Go cache cleaned"
 fi
 
-echo "Cleanup complete!"
+# Rust (Cargo) - Using global cache cleanup if cargo-cache is installed
+if command -v cargo-cache &> /dev/null; then
+    info "Cleaning global Cargo cache..."
+    cargo-cache --remove-dir all &> /dev/null && success "Cargo cache cleaned"
+fi
+
+# NPM (Node.js)
+if command -v npm &> /dev/null; then
+    info "Cleaning npm cache..."
+    npm cache clean --force &> /dev/null && success "npm cleaned"
+fi
+
+# Composer (PHP)
+if command -v composer &> /dev/null; then
+    info "Cleaning Composer cache..."
+    composer clear-cache -q && success "Composer cleaned"
+fi
+
+# Python (Pip)
+if command -v pip &> /dev/null; then
+    info "Cleaning pip cache..."
+    pip cache purge &> /dev/null && success "pip cleaned"
+fi
+
+# 3. Containers & Virtualization
+header "Containers & Flatpak"
+
+if command -v docker &> /dev/null; then
+    info "Truncating Docker container logs..."
+    sudo find /var/lib/docker/containers/ -name "*-json.log" -exec sh -c 'cat /dev/null > "{}"' \;
+    success "Docker logs cleared"
+fi
+
+if command -v flatpak &> /dev/null; then
+    info "Removing unused Flatpak runtimes..."
+    flatpak uninstall --unused -y &> /dev/null && success "Flatpak cleaned"
+fi
+
+# 4. Filesystem & Trash
+header "Filesystem Housekeeping"
+
+info "Cleaning user cache (~/.cache > 7 days)..."
+find ~/.cache -type f -atime +7 -delete && success "User cache trimmed"
+
+info "Cleaning thumbnail cache..."
+rm -rf ~/.cache/thumbnails/* && success "Thumbnails cleared"
+
+info "Removing broken symlinks in home..."
+find ~ -maxdepth 3 -xtype l -delete &> /dev/null && success "Broken symlinks removed"
+
+info "Running systemd-tmpfiles cleanup..."
+sudo systemd-tmpfiles --clean && success "Temp files cleaned"
+
+# 5. Summary
+header "Storage Status"
+df -h / | awk 'NR==2 {print "Total: " $2 " | Used: " $3 " | Free: " $4 " (" $5 ")"}'
+
+echo "----------------------------------------"
+echo -e "${BOLD}${GREEN}✅ System Optimized!${RESET}\n"

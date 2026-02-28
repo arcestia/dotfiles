@@ -14,7 +14,7 @@ echo "2) Scroll UP"
 echo "3) Scroll DOWN"
 echo "4) Move UP"
 echo "5) Move DOWN"
-echo "6) Move LEFT"
+echo "6) Move LEFT"1
 echo "7) Move RIGHT"
 echo "8) Random Move"
 read -p "Choice (1-8): " ACTION

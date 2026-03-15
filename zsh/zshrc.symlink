@@ -20,3 +20,5 @@ compinit
 
 # opencode
 export PATH=/home/laurenhs/.opencode/bin:$PATH
+
+export PATH=~/.npm-global/bin:$PATH

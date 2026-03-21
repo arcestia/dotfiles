@@ -1,4 +1,4 @@
-name: Mirror to Codeberg
+name: Mirror to Tangled
 on: [push, delete]
 
 jobs:

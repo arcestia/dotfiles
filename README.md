@@ -1,4 +1,4 @@
-# 🐚 arcestia's dotfiles
+# 🐚 Skiddle's dotfiles
 
 Personal configurations for Fedora + Hyprland, organized following the [Holman](https://github.com/holman/dotfiles) topical structure.
 
